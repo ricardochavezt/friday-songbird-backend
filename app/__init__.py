@@ -20,7 +20,9 @@ def start_here():
 
 @app.route('/canciones')
 def listar_canciones():
-    canciones = PostCancion.query.order_by(PostCancion.fecha_publicacion.desc()).all()
+    canciones = PostCancion.query.\
+                filter(PostCancion.fecha_publicacion <= datetime.today()).\
+                order_by(PostCancion.fecha_publicacion.desc()).all()
     return jsonify([cancion.serialize() for cancion in canciones])
 
 # admin
