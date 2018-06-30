@@ -35,5 +35,8 @@ class AuthView(ModelView):
                             401,
                             {'WWW-Authenticate': 'Basic fb=fbchallenge'})
 
+class PostCancionView(AuthView):
+    column_exclude_list = ['texto']
+
 admin = Admin(app, name="Friday Songbird", template_mode='bootstrap3')
-admin.add_view(AuthView(PostCancion, db.session))
+admin.add_view(PostCancionView(PostCancion, db.session))
