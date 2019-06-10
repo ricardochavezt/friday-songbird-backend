@@ -25,6 +25,12 @@ def listar_canciones():
                 order_by(PostCancion.fecha_publicacion.desc()).all()
     return jsonify([cancion.serialize() for cancion in canciones])
 
+@app.route('/listado_canciones')
+def listar_canciones_2():
+    canciones = PostCancion.query.\
+            order_by(PostCancion.fecha_publicacion.desc()).all()[:10]
+    return jsonify({'canciones': [cancion.serialize_short() for cancion in canciones]})
+
 # admin
 class AuthView(ModelView):
     def _handle_view(self, name, **kwargs):
