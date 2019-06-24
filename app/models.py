@@ -26,6 +26,13 @@ class PostCancion(db.Model):
             'youtube_url': self.youtube_url
         }
 
+    def serialize_min(self):
+        return {
+            'id': self.id,
+            'titulo': self.titulo,
+            'artista': self.artista
+        }
+
     def serialize_short(self):
         return {
             'id': self.id,

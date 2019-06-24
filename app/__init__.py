@@ -7,6 +7,7 @@ from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 import json
 from datetime import datetime
+from sqlalchemy import or_
 
 app = Flask(__name__)
 app.config.from_object('config')
@@ -20,16 +21,31 @@ def start_here():
 
 @app.route('/canciones')
 def listar_canciones():
+    termino_busqueda = request.args.get('t')
+    if termino_busqueda is not None:
+        return jsonify({'canciones': buscar_canciones(termino_busqueda)})
+
     canciones = PostCancion.query.\
                 filter(PostCancion.fecha_publicacion <= datetime.today()).\
                 order_by(PostCancion.fecha_publicacion.desc()).all()
     return jsonify([cancion.serialize() for cancion in canciones])
 
+def buscar_canciones(termino):
+    canciones = PostCancion.query.\
+                filter(or_(PostCancion.titulo.ilike('%'+termino+'%'), PostCancion.artista.ilike('%'+termino+'%'))).\
+                order_by(PostCancion.fecha_publicacion.desc()).all()[:10]
+    return [cancion.serialize_short() for cancion in canciones]
+
 @app.route('/listado_canciones')
 def listar_canciones_2():
     canciones = PostCancion.query.\
             order_by(PostCancion.fecha_publicacion.desc()).all()[:10]
-    return jsonify({'canciones': [cancion.serialize_short() for cancion in canciones]})
+    return jsonify({'canciones': [cancion.serialize_min() for cancion in canciones]})
+
+@app.route('/canciones/<int:id_cancion>')
+def obtener_cancion(id_cancion):
+    cancion = PostCancion.query.get(id_cancion)
+    return jsonify(cancion.serialize_short())
 
 # admin
 class AuthView(ModelView):
